@@ -164,7 +164,7 @@ The scripts in `ai/` were run in this order after the satellite layers were prep
 | `29_ai_models.py` | The three browser models, comparison, importance and curves |
 
 ## 16. Originality, AI use and credits
-- **Originality:** the satellite layers were prepared earlier by the author in her own UrbanSense: Twin Cities project. The web portal, models, analytics, click, draw and search tools, climate context, AI Center and priority-zone engine were built for this hackathon.
+- **Originality:** this project was built from scratch for the NYLP AI Hackathon 2026 by the author. The satellite layers, web portal, models, analytics, click, draw and search tools, climate context, AI Center and priority-zone engine were all prepared for this hackathon.
 - **AI tools used as development assistants:** Claude and ChatGPT helped with code and explanations. The author tested and reviewed all outputs.
 - **Third-party AI services on the live site:** none.
 - **Data:** Landsat (USGS and NASA), Sentinel-2 (ESA Copernicus), Dynamic World (Google and WRI), WorldPop (University of Southampton), SRTM (USGS and NASA), ERA5-Land (ECMWF and the Copernicus Climate Change Service), CHIRPS (UCSB Climate Hazards Center), FAO GAUL, Google Earth Engine. Data licences remain with their providers.
