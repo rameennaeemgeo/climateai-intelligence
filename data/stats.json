@@ -1,0 +1,126 @@
+{
+  "study_area": {
+    "name": "Islamabad District",
+    "area_km2": 895.4,
+    "pixel_size_m": 100,
+    "source_crs": "EPSG:32643"
+  },
+  "bounds": {
+    "south": 33.4836891611805,
+    "west": 72.80915224534944,
+    "north": 33.8139891611805,
+    "east": 73.39505224534943
+  },
+  "population_total_2020": 2054715,
+  "layers": {
+    "LST": {
+      "label": "Land Surface Temperature",
+      "unit": "deg C",
+      "file": "layers/LST.png",
+      "colormap": "YlOrRd",
+      "mean": 40.427,
+      "min": 26.908,
+      "max": 49.085,
+      "p2": 32.369,
+      "p98": 45.727
+    },
+    "NDVI": {
+      "label": "Vegetation (NDVI)",
+      "unit": "index",
+      "file": "layers/NDVI.png",
+      "colormap": "YlGn",
+      "mean": 0.346,
+      "min": -0.483,
+      "max": 0.863,
+      "p2": 0.08,
+      "p98": 0.715
+    },
+    "NDBI": {
+      "label": "Built-up index (NDBI)",
+      "unit": "index",
+      "file": "layers/NDBI.png",
+      "colormap": "PuOr_r",
+      "mean": 0.002,
+      "min": -0.42,
+      "max": 0.303,
+      "p2": -0.198,
+      "p98": 0.118
+    },
+    "BUILTUP": {
+      "label": "Built-up probability",
+      "unit": "probability",
+      "file": "layers/BUILTUP.png",
+      "colormap": "magma",
+      "mean": 0.372,
+      "min": 0.026,
+      "max": 0.776,
+      "p2": 0.033,
+      "p98": 0.746
+    },
+    "DEM": {
+      "label": "Elevation",
+      "unit": "m",
+      "file": "layers/DEM.png",
+      "colormap": "terrain",
+      "mean": 595.849,
+      "min": 411.94,
+      "max": 1549.11,
+      "p2": 451.83,
+      "p98": 1086.155
+    },
+    "POP": {
+      "label": "Population density (2020)",
+      "unit": "people/km2",
+      "file": "layers/POP.png",
+      "colormap": "YlOrBr",
+      "mean": 2306.336,
+      "min": 121.042,
+      "max": 16777.109,
+      "p2": 194.335,
+      "p98": 7860.608
+    },
+    "AIR": {
+      "label": "Air temperature (ERA5-Land, about 11 km)",
+      "unit": "deg C",
+      "file": "layers/AIR.png",
+      "colormap": "Spectral_r",
+      "mean": 30.08,
+      "min": 27.453,
+      "max": 31.316,
+      "p2": 28.013,
+      "p98": 31.169
+    },
+    "RAIN": {
+      "label": "Rainfall (CHIRPS, about 5 km)",
+      "unit": "mm",
+      "file": "layers/RAIN.png",
+      "colormap": "Blues",
+      "mean": 117.535,
+      "min": 79.167,
+      "max": 158.282,
+      "p2": 86.884,
+      "p98": 146.865
+    }
+  },
+  "exposure": {
+    "0": {
+      "label": "Other areas",
+      "area_km2": 740.0,
+      "pct": 83.1,
+      "population": 1695970
+    },
+    "1": {
+      "label": "Hot (top 25% LST)",
+      "area_km2": 79.2,
+      "pct": 8.9,
+      "population": 123637
+    },
+    "2": {
+      "label": "Hotspot",
+      "area_km2": 71.7,
+      "pct": 8.0,
+      "population": 235107
+    }
+  },
+  "data_note": "Derived from the author's UrbanSense university project: Landsat 8/9 LST (5 scenes), Sentinel-2 NDVI/NDBI (8 dates), 29 May - 8 Jul 2026; WorldPop 2020; DEM. Single-season snapshot. Air temperature: ERA5-Land daily mean, 29 May to 8 Jul 2026 (about 11 km grid, smoothed). Rainfall: CHIRPS daily, summed over the same dates (about 5 km grid, smoothed)."
+}

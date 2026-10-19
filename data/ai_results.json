@@ -1,0 +1,47 @@
+{
+  "model": "Random Forest regression predicting land surface temperature from vegetation, built-up, elevation and population (100 m grid, spatial block validation)",
+  "r2": 0.83,
+  "rmse": 1.39,
+  "n_pixels": 89090,
+  "feature_importance": [
+    {
+      "label": "Built-up index (NDBI)",
+      "importance": 0.397
+    },
+    {
+      "label": "Vegetation (NDVI)",
+      "importance": 0.291
+    },
+    {
+      "label": "Elevation",
+      "importance": 0.26
+    },
+    {
+      "label": "Built-up probability",
+      "importance": 0.028
+    },
+    {
+      "label": "Population density",
+      "importance": 0.025
+    }
+  ],
+  "what_if": [
+    {
+      "ndvi_increase": 0,
+      "mean_lst_c": 40.45
+    },
+    {
+      "ndvi_increase": 0.05,
+      "mean_lst_c": 40.29
+    },
+    {
+      "ndvi_increase": 0.1,
+      "mean_lst_c": 40.03
+    },
+    {
+      "ndvi_increase": 0.15,
+      "mean_lst_c": 39.71
+    }
+  ],
+  "limits": "Single summer season (May-Jul 2026). The model explains spatial patterns of surface heat; it does not forecast future temperatures."
+}
