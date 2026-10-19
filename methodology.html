@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Methodology and Data Sources | ClimateAI Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+.doc{max-width:900px;margin:0 auto;padding:1.5rem}
+.doc h2{margin:2rem 0 .6rem;font-size:1.15rem}
+.doc p,.doc li{max-width:78ch}
+.doc table{width:100%;border-collapse:collapse;font-size:.95rem;margin:.5rem 0}
+.doc th,.doc td{border-bottom:1px solid var(--line);padding:.5rem .6rem;text-align:left;vertical-align:top}
+.doc th{color:var(--teal);font-weight:600}
+.doc a{color:var(--teal)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div><h1>Methodology and data sources</h1><p>ClimateAI Intelligence, Islamabad District pilot</p></div>
+  <a class="pilot" style="text-decoration:none" href="index.html">Back to the platform</a>
+</header>
+<main class="doc">
+
+<h2>What this platform does</h2>
+<p>ClimateAI Intelligence maps surface heat, vegetation, built-up areas, population, air temperature and rainfall for Islamabad District. It shows how many people live in the hottest areas, explains what drives surface heat with machine learning models, lets visitors test vegetation and development scenarios, and ranks areas where greening would help first. It is a screening tool built on one summer season of data. It is not an official risk assessment.</p>
+
+<h2>Data</h2>
+<table>
+<tr><th>Layer</th><th>Source and processing</th></tr>
+<tr><td>Land surface temperature (LST)</td><td>Landsat 8 and 9 thermal data, 30 m. Composite of 5 clear scenes: 29 May, 6 Jun, 14 Jun, 30 Jun and 8 Jul 2026.</td></tr>
+<tr><td>Vegetation (NDVI) and built-up index (NDBI)</td><td>Sentinel-2, 30 m grid. Composite of 8 dates between 29 May and 8 Jul 2026.</td></tr>
+<tr><td>Built-up probability</td><td>Dynamic World built-up probability, averaged over 29 May to 8 Jul 2026.</td></tr>
+<tr><td>Population density</td><td>WorldPop 2020 gridded estimate, 100 m. This is a modelled 2020 estimate, not a 2026 count.</td></tr>
+<tr><td>Elevation</td><td>SRTM digital elevation model (USGS and NASA, SRTMGL1 v003), 30 m, averaged to 100 m.</td></tr>
+<tr><td>Air temperature</td><td>ERA5-Land reanalysis (ECMWF), daily mean 2 m air temperature, about 11 km grid, 29 May to 8 Jul 2026. Shown on the map smoothed onto the 100 m grid, so it looks like a gentle gradient and does not contain 100 m detail.</td></tr>
+<tr><td>Rainfall</td><td>CHIRPS daily rainfall (UCSB Climate Hazards Center), about 5 km grid, summed over 29 May to 8 Jul 2026 and smoothed onto the 100 m grid in the same way.</td></tr>
+<tr><td>Study area</td><td>Islamabad District, FAO GAUL level 2 boundary (about 895 km²).</td></tr>
+</table>
+<p>The satellite layers were processed in Google Earth Engine and Python in the author's own UrbanSense: Twin Cities project (BS Geoinformatics, PMAS-Arid Agriculture University). They were resampled to a common 100 m grid (UTM zone 43N) and clipped to Islamabad District. Population totals are density multiplied by pixel area. Everything else on this site, including the web portal, the AI models, the analytics, the click and search tools, the climate context and the priority-zone engine, was built for the NYLP AI Hackathon 2026.</p>
+
+<h2>Heat exposure classes</h2>
+<table>
+<tr><th>Class</th><th>Definition</th></tr>
+<tr><td>Other areas</td><td>Pixels that are not in the top 25% of land surface temperature.</td></tr>
+<tr><td>Hot (top 25% LST)</td><td>Land surface temperature at or above the 75th percentile, but not meeting the hotspot rule.</td></tr>
+<tr><td>Hotspot</td><td>Land surface temperature at or above the 75th percentile, NDVI at or below the 25th percentile (sparse vegetation), and population density at or above the 75th percentile.</td></tr>
+</table>
+<p>The thresholds are percentiles of the whole Twin Cities study area (Rawalpindi and Islamabad districts). They are relative to this region and are not health standards.</p>
+
+<h2>Climate context</h2>
+<ul>
+<li>Daily air temperature (ERA5-Land) and rainfall (CHIRPS) are averaged over Islamabad District for 29 May to 8 Jul 2026.</li>
+<li>The same six-week window is computed for every year from 1991 to 2026. The 1991 to 2020 average is the normal, and 2026 is compared with it. The 1991 to 2025 linear trend is indicative only and has no significance test.</li>
+<li>Surface minus air compares the satellite surface temperature with ERA5-Land air temperature at 06:00 UTC (about 11:00 in Pakistan, close to the satellite pass) on the five scene dates.</li>
+</ul>
+
+<h2>AI models</h2>
+<ul>
+<li><b>Main model (map page):</b> Random Forest regression (150 trees) that predicts land surface temperature from NDVI, NDBI, built-up probability, elevation and population density, using 89,090 pixels at 100 m. Spatial block validation: the area was split into about 2 km blocks and 25% of the blocks were held out for testing. Test R² is 0.83 and the error is 1.39 °C.</li>
+<li><b>Prediction page:</b> three compact models that run in the browser (linear regression, Random Forest with 30 trees, gradient boosting with 60 trees), trained on the same training blocks and compared on the same held-out blocks. They are smaller than the main model, so their accuracy can be slightly lower.</li>
+<li><b>Explainable AI page:</b> overall importance is permutation importance on held-out blocks. "Why this prediction" replaces one factor at a time with the Islamabad average and shows the change in the prediction, so the bars are one-at-a-time effects and do not add up exactly. The curves show how the prediction changes as one factor varies with the others at typical values.</li>
+<li><b>Climate Simulator:</b> the compact Random Forest is re-run with vegetation or built-up values changed, for the whole district or a 1, 2 or 5 km circle. The result is a model-based estimate, not a forecast. NDVI and NDBI are strongly linked in reality (correlation -0.91), so changing only one is an idealised case.</li>
+<li><b>Climate Risk Intelligence:</b> each pixel's risk is a weighted average of its percentile rank for surface heat, lack of vegetation, population density and built-up probability. The weights are set by the visitor. Classes are 0 to 20, 20 to 40, 40 to 60, 60 to 80 and 80 to 100. The top 10 areas are 1 km cells with at least 30 pixels, ranked by average risk.</li>
+<li><b>Priority zones (map page):</b> 1 km cells are scored from 0 to 100 as the average of three ranks (hotter surface, less vegetation, more people). The estimated cooling is the drop predicted by the Random Forest if NDVI rose by 0.10 in the cell.</li>
+<li><b>AI Climate Copilot:</b> a rule-based assistant. It matches a question to prepared results from this project's own data and models. It does not use a language model or any external AI service.</li>
+</ul>
+
+<h2>Click, draw and search tools</h2>
+<p>Clicking or searching a place finds the nearest 100 m cell (within 100 m) and shows its values. Drawing a shape averages the cells inside it. Place names come from OpenStreetMap services (Nominatim and Overpass): the map coordinates, or the text a visitor searches for, are sent to those services only to find the name. Names are only as detailed as OpenStreetMap's data.</p>
+
+<h2>Limitations</h2>
+<ul>
+<li>The satellite data covers one summer season (29 May to 8 Jul 2026). The models explain spatial patterns of heat and cannot forecast future temperatures or show trends.</li>
+<li>Land surface temperature is the temperature of the ground and roofs seen by the satellite. It is not air temperature, and the page shows both.</li>
+<li>Air temperature and rainfall come from a reanalysis (about 11 km) and a satellite-gauge product (about 5 km). They are not weather-station measurements, and on the map they are smoothed, so they carry no 100 m detail.</li>
+<li>The models find associations, not causes. Elevation mostly reflects that higher ground is cooler, which cannot be changed.</li>
+<li>WorldPop is a modelled estimate for 2020, so population counts are approximate.</li>
+<li>Results have not yet been checked against ground measurements such as weather stations.</li>
+<li>The models were trained and tested inside Islamabad District only and should not be applied to other regions without retraining.</li>
+</ul>
+
+<h2>Responsible use and privacy</h2>
+<p>The portal does not collect or store personal data. It has no accounts, tracking or API keys. When a visitor clicks or searches a place, the coordinates or search text are sent to OpenStreetMap services only to look up the place name. Results are a screening aid for planning discussions, not an official risk assessment.</p>
+
+<h2>Credits and tools</h2>
+<p>Data: Landsat (USGS and NASA), Sentinel-2 (ESA Copernicus), Dynamic World (Google and WRI), WorldPop (University of Southampton), SRTM (USGS and NASA), ERA5-Land (ECMWF and the Copernicus Climate Change Service), CHIRPS (UCSB Climate Hazards Center), FAO GAUL, Google Earth Engine. Software: Leaflet, Leaflet.draw, Chart.js, Python with scikit-learn, pandas, NumPy, rasterio and matplotlib. Basemap tiles by Esri and OpenStreetMap contributors. AI development assistants: Claude and ChatGPT were used for coding help and explanations, and the author tested and reviewed the results. No third-party AI service runs on the live site. Prepared by Rameen Naeem.</p>
+</main>
+</body>
+</html>

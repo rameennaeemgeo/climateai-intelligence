@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Charts and Tables | ClimateAI Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+.page{max-width:1500px;margin:auto;padding:1rem 1.5rem}
+.page h2{margin:1.5rem 0 .75rem}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:1rem}
+.card h3{margin:0 0 .5rem;font:500 .95rem Sora,sans-serif}
+.card canvas{width:100%!important;height:250px!important}
+.scroll{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:.92rem}
+.t th,.t td{border-bottom:1px solid var(--line);padding:.45rem .6rem;text-align:right;white-space:nowrap}
+.t th:first-child,.t td:first-child{text-align:left}
+.t th{color:var(--teal);font-weight:600}
+.small{color:var(--mute);font-size:.88rem;margin:.5rem 0 0}
+nav a{color:#dbe8ff;margin-left:1rem}
+</style>
+</head>
+<body>
+<header class="top">
+  <div><h1>Charts and tables</h1><p>Islamabad District, 100 m grid, summer 2026</p></div>
+  <nav><a href="index.html">Map</a><a href="methodology.html">Methodology</a></nav>
+</header>
+<main class="page">
+  <section id="climate" hidden>
+    <h2>Climate context: air temperature and rainfall</h2>
+    <div class="charts" id="c-kpis"></div>
+    <div class="charts" id="c-charts" style="margin-top:1rem"></div>
+    <p class="small" id="c-note"></p>
+  </section>
+
+  <h2>Index summary statistics</h2>
+  <div class="card scroll"><table class="t" id="t-summary"></table>
+    <p class="small">Statistics over all valid 100 m pixels. p5 and p95 are the 5th and 95th percentiles.</p></div>
+
+  <h2>Histograms</h2>
+  <div class="charts" id="hists"></div>
+  <p class="small">Each bar shows the share of pixels in a value range. The range shown covers the 1st to 99th percentile.</p>
+
+  <h2>How surface temperature changes with each indicator</h2>
+  <div class="charts" id="rels"></div>
+  <p class="small">Mean land surface temperature in equal-width bins of each indicator. This shows association, not cause.</p>
+
+  <h2>Heat exposure classes compared</h2>
+  <div class="charts">
+    <div class="card"><h3>Mean surface temperature by class (deg C)</h3><canvas id="c-class"></canvas></div>
+    <div class="card scroll"><table class="t" id="t-class"></table></div>
+  </div>
+
+  <h2>Correlation between indicators</h2>
+  <div class="card scroll"><table class="t" id="t-corr"></table>
+    <p class="small">Pearson correlation. Teal is positive, red is negative.</p></div>
+</main>
+<footer>Single summer season. Land surface temperature is not air temperature. Screening tool, not an official risk assessment.</footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+Chart.defaults.color = "#586a86";
+Chart.defaults.borderColor = "#d6e0ee";
+Chart.defaults.font.family = '"Source Sans 3", system-ui, sans-serif';
+const TEAL = "#1d6fd8", BLUE = "#3b8cff";
+const fmt = n => Number(n).toLocaleString("en-US");
+
+function table(id, head, rows) {
+  document.getElementById(id).innerHTML =
+    "<tr>" + head.map(h => `<th>${h}</th>`).join("") + "</tr>" +
+    rows.map(r => "<tr>" + r.map(c => `<td${c && c.s ? ` style="${c.s}"` : ""}>${c && c.v !== undefined ? c.v : c}</td>`).join("") + "</tr>").join("");
+}
+function card(parent, title) {
+  const d = document.createElement("div");
+  d.className = "card";
+  d.innerHTML = `<h3>${title}</h3><canvas></canvas>`;
+  document.getElementById(parent).appendChild(d);
+  return d.querySelector("canvas");
+}
+const axis = (t) => ({ title: { display: true, text: t } });
+
+fetch("data/charts.json").then(r => r.json()).then(d => {
+  table("t-summary", ["Indicator", "Unit", "Mean", "Median", "Std dev", "Min", "p5", "p95", "Max"],
+    d.summary.map(s => [s.label, s.unit, s.mean, s.median, s.std, s.min, s.p5, s.p95, s.max].map(x => typeof x === "number" ? fmt(x) : x)));
+
+  Object.values(d.histograms).forEach(h => {
+    new Chart(card("hists", `${h.label} (${h.unit})`), {
+      type: "bar",
+      data: { labels: h.centers, datasets: [{ data: h.pct, backgroundColor: TEAL, barPercentage: 1, categoryPercentage: 1 }] },
+      options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
+        scales: { x: { ...axis(h.unit), ticks: { maxTicksLimit: 6 } }, y: axis("% of pixels") } }
+    });
+  });
+
+  Object.values(d.relations).forEach(r => {
+    new Chart(card("rels", `Surface temperature vs ${r.label}`), {
+      type: "line",
+      data: { labels: r.x, datasets: [{ data: r.lst, borderColor: "#fd8d3c", backgroundColor: "#fd8d3c", tension: .25, pointRadius: 3 }] },
+      options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
+        scales: { x: { ...axis(r.label), ticks: { maxTicksLimit: 6 } }, y: axis("Mean LST (deg C)") } }
+    });
+  });
+
+  const colors = ["#2ecc71", "#f39c12", "#e74c3c"];
+  new Chart(document.getElementById("c-class"), {
+    type: "bar",
+    data: { labels: d.classes.map(c => c.label), datasets: [{ data: d.classes.map(c => c.LST), backgroundColor: colors }] },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { y: { ...axis("Mean LST (deg C)"), beginAtZero: false } } }
+  });
+  table("t-class", ["Class", "Pixels", "LST (deg C)", "NDVI", "NDBI", "Built-up prob.", "People/km2"],
+    d.classes.map(c => [c.label, fmt(c.n), c.LST, c.NDVI, c.NDBI, c.BUILTUP, fmt(c.POP)]));
+
+  const L = d.correlation.labels;
+  table("t-corr", [""].concat(L), d.correlation.matrix.map((row, i) =>
+    [L[i]].concat(row.map(v => ({ v, s: `background:${v >= 0 ? "rgba(29,111,216," : "rgba(231,76,60,"}${Math.abs(v) * 0.6})` })))));
+}).catch(() => {
+  document.querySelector(".page").insertAdjacentHTML("afterbegin",
+    '<p class="card">Could not load data/charts.json. Run scripts/24_charts_data.py, copy charts.json into the data folder, and open the site through the local server.</p>');
+});
+
+// Climate context (data/climate.json)
+fetch("data/climate.json").then(r => r.json()).then(c => {
+  document.getElementById("climate").hidden = false;
+  const k = (t, v, n) => `<div class="card"><h3>${t}</h3><b style="font:700 1.5rem Sora,sans-serif">${v}</b><p class="small">${n}</p></div>`;
+  const a = c.anomaly_2026, sv = c.surface_vs_air, sg = x => (x >= 0 ? "+" : "") + x;
+  document.getElementById("c-kpis").innerHTML =
+    k("Mean air temperature", c.summary.t_mean + " °C", `${c.window.start} to ${c.window.end}, hottest day ${c.summary.t_max_peak} °C`) +
+    k("Rainfall in the same period", c.summary.rain_total + " mm", `${a.rain_pct}% of the ${c.normal.period} normal (${c.normal.rain} mm)`) +
+    k("Compared with the normal", sg(a.t_diff) + " °C", `Air temperature vs the ${c.normal.period} average (${c.normal.t} °C) for the same dates`) +
+    (sv.diff !== null ? k("Surface vs air at satellite time", sg(sv.diff) + " °C", `Mean surface ${sv.lst_mean} °C vs air ${sv.air_at_overpass} °C (${sv.scenes} scene dates)`) : "");
+
+  const D = c.daily, days = D.map(d => d.date.slice(5));
+  new Chart(card("c-charts", "Daily air temperature and rainfall"), {
+    data: { labels: days, datasets: [
+      { type: "bar", label: "Rainfall (mm)", data: D.map(d => d.rain), backgroundColor: BLUE, yAxisID: "y1" },
+      { type: "line", label: "Max (°C)", data: D.map(d => d.t_max), borderColor: "#e74c3c", pointRadius: 0, yAxisID: "y" },
+      { type: "line", label: "Mean (°C)", data: D.map(d => d.t_mean), borderColor: "#fd8d3c", pointRadius: 0, yAxisID: "y" },
+      { type: "line", label: "Min (°C)", data: D.map(d => d.t_min), borderColor: TEAL, pointRadius: 0, yAxisID: "y" }] },
+    options: { maintainAspectRatio: false, scales: { x: { ticks: { maxTicksLimit: 8 } }, y: axis("Air temperature (°C)"),
+      y1: { ...axis("Rainfall (mm)"), position: "right", grid: { drawOnChartArea: false } } } }
+  });
+
+  const Y = c.years, labs = Y.map(y => y.year), hi = Y.map(y => y.year === 2026);
+  new Chart(card("c-charts", `Air temperature in the same 6 weeks, every year (normal ${c.normal.t} °C)`), {
+    data: { labels: labs, datasets: [
+      { type: "bar", label: "Mean air temperature (°C)", data: Y.map(y => y.t), backgroundColor: hi.map(h => h ? "#fd8d3c" : "#3b6ea8") },
+      { type: "line", label: "1991-2020 normal", data: Y.map(() => c.normal.t), borderColor: "#0b2447", borderDash: [6, 4], pointRadius: 0 }] },
+    options: { maintainAspectRatio: false, scales: { x: { ticks: { maxTicksLimit: 8 } }, y: { ...axis("°C"), beginAtZero: false } } }
+  });
+  new Chart(card("c-charts", `Rainfall in the same 6 weeks, every year (normal ${c.normal.rain} mm)`), {
+    data: { labels: labs, datasets: [
+      { type: "bar", label: "Rainfall (mm)", data: Y.map(y => y.rain), backgroundColor: hi.map(h => h ? "#fd8d3c" : BLUE) },
+      { type: "line", label: "1991-2020 normal", data: Y.map(() => c.normal.rain), borderColor: "#0b2447", borderDash: [6, 4], pointRadius: 0 }] },
+    options: { maintainAspectRatio: false, scales: { x: { ticks: { maxTicksLimit: 8 } }, y: axis("mm") } }
+  });
+  document.getElementById("c-note").textContent = c.notes +
+    ` The 1991-2025 linear trend for this window is ${sg(c.trend.t_per_decade)} °C per decade (indicative only, no significance test). Surface vs air compares the satellite surface temperature with air temperature at 06:00 UTC, about 11:00 in Pakistan.`;
+}).catch(() => {});
+</script>
+</body>
+</html>
