@@ -8,7 +8,7 @@
 | **Live platform** | https://rameennaeemgeo.github.io/climateai-intelligence/ |
 | **Source code** | https://github.com/rameennaeemgeo/climateai-intelligence |
 | **Methodology page** | https://rameennaeemgeo.github.io/climateai-intelligence/methodology.html |
-| **Demo video** | *(paste the video link here after uploading it)* |
+| **Demo video** | https://www.youtube.com/watch?v=RJo-xhhSDEU |
 
 ---
 
