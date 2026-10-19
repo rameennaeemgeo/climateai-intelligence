@@ -122,5 +122,5 @@
       "population": 235107
     }
   },
-  "data_note": "Derived from the author's UrbanSense university project: Landsat 8/9 LST (5 scenes), Sentinel-2 NDVI/NDBI (8 dates), 29 May - 8 Jul 2026; WorldPop 2020; DEM. Single-season snapshot. Air temperature: ERA5-Land daily mean, 29 May to 8 Jul 2026 (about 11 km grid, smoothed). Rainfall: CHIRPS daily, summed over the same dates (about 5 km grid, smoothed)."
+  "data_note": " Landsat 8/9 LST (5 scenes), Sentinel-2 NDVI/NDBI (8 dates), 29 May - 8 Jul 2026; WorldPop 2020; DEM. Single-season snapshot. Air temperature: ERA5-Land daily mean, 29 May to 8 Jul 2026 (about 11 km grid, smoothed). Rainfall: CHIRPS daily, summed over the same dates (about 5 km grid, smoothed)."
 }
