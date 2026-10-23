@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClimateAI Intelligence | AI-Powered Climate Risk and Environmental Monitoring Platform</title>
+<meta name="description" content="AI-powered climate risk and environmental monitoring platform for Islamabad: surface heat, vegetation, built-up areas, population exposure and a machine learning model.">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>ClimateAI Intelligence</h1>
+    <p>AI-powered climate risk and environmental monitoring platform</p>
+  </div>
+  <nav style="display:flex;gap:.6rem;flex-wrap:wrap"><span class="pilot">Islamabad District pilot</span><a class="pilot" style="text-decoration:none" href="analytics.html">Charts and tables</a><a class="pilot" style="text-decoration:none" href="methodology.html">Methodology</a></nav>
+</header>
+<main class="grid">
+  <aside class="side">
+    <section class="kpis" id="kpis"></section>
+    <section>
+      <h2>Map layers</h2>
+      <div id="layer-list" class="layers"></div>
+      <label class="opac">Layer opacity
+        <input type="range" id="opacity" min="0.2" max="1" step="0.05" value="0.8">
+      </label>
+      <div id="legend" class="legend"></div>
+    </section>
+  </aside>
+  <section class="mapwrap"><div id="map" aria-label="Interactive map"></div></section>
+  <section class="panel"><h2>Heat exposure of population</h2><div id="exposure"></div></section>
+  <section class="panel"><h2>AI risk model</h2><div id="ai">Loading...</div></section>
+  <section class="panel note" id="note"></section>
+</main>
+<footer>Satellite-derived indicators from a single summer season. Land surface temperature is not air temperature. Results are for screening, not an official risk assessment.</footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script src="app.js"></script>
+<script src="draw.js"></script>
+</body>
+</html>
